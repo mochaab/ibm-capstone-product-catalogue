@@ -30,6 +30,7 @@ from decimal import Decimal
 from service.models import Product, Category, db
 from service import app
 from tests.factories import ProductFactory
+import nose
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
@@ -104,3 +105,92 @@ class TestProductModel(unittest.TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+    def test_read_a_product(self):
+        """It should read a product from the database"""
+        # create a product
+        product = ProductFactory()
+        # add a log message displaying the product for debugging errors
+        logging.info("Product details: " + str(product.serialize()))
+        # to assure that id is auto-generated, setting the id to none before record is created
+        product.id = None
+        
+        # after creation, id is auto-generated therefore not none
+        product.create()
+        self.assertIsNotNone(product.id)
+
+        # fetch the product back from the database
+        products = Product.all()
+        new_product = products[0]
+
+        self.assertEqual(product.name, new_product.name)
+        self.assertEqual(product.description, new_product.description)
+        self.assertEqual(product.price, new_product.price)
+        self.assertEqual(product.available, new_product.available)
+        self.assertEqual(product.category, new_product.category)
+
+
+    def test_update_a_product(self):
+        """It should update a product from a database"""
+        product = ProductFactory()
+        logging.info("Product details: " + str(product.serialize()))
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+
+        # fetch newly created product
+        products = Product.all()
+        new_product = products[0]
+
+        # updated
+        logging.info("Before updating:" + str(new_product.serialize()))
+        new_product.description = "updated"
+        new_product.update()
+        self.assertEqual(product.id, new_product.id)
+        self.assertEqual(product.description,"updated")
+
+        # Fetch it back and make sure the id has not changed
+        # but the data did change
+        products = Product.all()
+        self.assertEqual(len(products),1)
+        self.assertEqual(products[0].id, product.id)
+        self.assertEqual(products[0].description, product.description)
+
+    def test_delete_a_product(self):
+       """It should delete a product from a database"""
+       # create a product
+       product = ProductFactory()
+       product.create()
+       
+       # assert that after creating a product and saving to the database
+       # there is only one product in the system
+       products = Product.all()
+       self.assertEqual(len(products),1)
+
+       # remove product from the database
+       product.delete()
+       products = Product.all()
+       self.assertEqual(len(products),0)
+
+    def test_list_all_products(self):
+        """It should list all products"""
+        products = Product.all()
+        self.assertEqual(len(products),0)
+
+        # create 5 records
+        for i in range(5):
+            new_product = ProductFactory()
+            new_product.create()
+        
+        products = Product.all()
+        self.assertEqual(len(products),5)
+    
+    def test_find_product_by_name(self):
+        """It should find product by name"""
+        # create 5 records
+        for i in range(5):
+            new_product = ProductFactory()
+            new_product.create()
+        
+        # products = Product.all()
+        
+
