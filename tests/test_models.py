@@ -27,7 +27,7 @@ import os
 import logging
 import unittest
 from decimal import Decimal
-from service.models import Product, Category, db
+from service.models import Product, Category, db, DataValidationError
 from service import app
 from tests.factories import ProductFactory
 import nose
@@ -130,30 +130,70 @@ class TestProductModel(unittest.TestCase):
 
 
     def test_update_a_product(self):
-        """It should update a product from a database"""
+        """It should Update a Product"""
         product = ProductFactory()
-        logging.info("Product details: " + str(product.serialize()))
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+        # Change it an save it
+        product.description = "testing"
+        original_id = product.id
+        product.update()
+        self.assertEqual(product.id, original_id)
+        self.assertEqual(product.description, "testing")
+        
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        products = Product.all()
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].id, original_id)
+        self.assertEqual(products[0].description, "testing")
+
+        # update again with empty id
+        # products[0].id = None
+
+        # """It should update a product from a database"""
+        # product = ProductFactory()
+        # logging.info("Product details: " + str(product.serialize()))
+        # product.id = None
+        # product.create()
+        # self.assertIsNotNone(product.id)
+
+        # # fetch newly created product
+        # products = Product.all()
+        # new_product = products[0]
+
+        # # updated
+        # logging.info("Before updating:" + str(new_product.serialize()))
+        # new_product.description = "updated"
+        # original_id = new_product.id
+        # new_product.update()
+        # self.assertEqual(product.id, original_id)
+        # self.assertEqual(product.description,"updated")
+
+        # # Fetch it back and make sure the id has not changed
+        # # but the data did change
+        # products = Product.all()
+        # self.assertEqual(len(products),1)
+        # self.assertEqual(products[0].id, original_id)
+        # self.assertEqual(products[0].description, "updated")
+
+    def test_update_a_product_empty_id(self):
+        """It should raise DataValidationError when Id is empty"""
+        # create a product
+        product = ProductFactory()
         product.id = None
         product.create()
         self.assertIsNotNone(product.id)
 
-        # fetch newly created product
-        products = Product.all()
-        new_product = products[0]
+        # update the product
+        product.description = "updated"
+        with self.assertRaises(DataValidationError) as context: 
+            product.id = None
+            product.update()
+        # self.assertEqual(str(context.exception),"Update called with empty ID field")
 
-        # updated
-        logging.info("Before updating:" + str(new_product.serialize()))
-        new_product.description = "updated"
-        new_product.update()
-        self.assertEqual(product.id, new_product.id)
-        self.assertEqual(product.description,"updated")
 
-        # Fetch it back and make sure the id has not changed
-        # but the data did change
-        products = Product.all()
-        self.assertEqual(len(products),1)
-        self.assertEqual(products[0].id, product.id)
-        self.assertEqual(products[0].description, product.description)
 
     def test_delete_a_product(self):
        """It should delete a product from a database"""
