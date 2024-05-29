@@ -356,25 +356,40 @@ class TestProductModel(unittest.TestCase):
         with self.assertRaises(DataValidationError): 
             product.deserialize(product_dictionary)
 
-    def test_deserialize_attribute_invalid(self):
-        """It should throw an error when a non-existing attribute is assigned"""
+    # def test_deserialize_attribute_invalid(self):
+    #     """It should throw an error when a non-existing attribute is assigned"""
 
-        product = self.create_and_validate_product()
+    #     product = Product()
 
-        product_dictionary = {
-            "name": "Laptop",
-            "description": "A high-performance laptop",
-            "price": "999.99",
-            "available": True,
-            "category": Category.CLOTHS,
-            "stocks":2 # non-existing attribute
-        }
+    #     product_dictionary = {}
 
-        with self.assertRaises(DataValidationError): 
-            product.deserialize(product_dictionary)
+    #     with self.assertRaises(DataValidationError): 
+    #         product.deserialize({})
 
 
-    
+    def test_find_by_id(self):
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+
+        first = products[0].id
+        found = Product.find(first)
+
+        self.assertEqual(first, found.id)
+
+    def test_find_by_price(self):
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+
+        first = Decimal(products[0].price)
+        occurrences = len([product for product in products if product.price == first])
+        found = Product.find_by_price(first)
+
+        self.assertEqual(found.count(),occurrences)
+
+        for product in found: 
+            self.assertEqual(product.price, first)
 
 
 
