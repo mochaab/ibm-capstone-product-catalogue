@@ -68,13 +68,14 @@ class TestProductModel(unittest.TestCase):
         db.session.remove()
 
     def create_and_validate_product(self):
+        """This creates ProductFactory and validates it"""
         product = ProductFactory()
         product.id = None
         product.create()
         return product
 
     def validate_product(self, product):
-        "It should validate all fields of product once factory is created"
+        """It should validate all fields of product once factory is created"""
         self.assertIsNotNone(product.id)
         self.assertIsNotNone(product.name)
         self.assertIsNotNone(product.description)
@@ -83,6 +84,7 @@ class TestProductModel(unittest.TestCase):
         self.assertIsNotNone(product.category)
 
     def validate_serialized_deserialized(self, product, product_dictionary):
+        """It should validates the results for serialized and deserialized"""
         self.assertEqual(product.id, product_dictionary["id"])
         self.assertEqual(product.name, product_dictionary["name"])
         self.assertEqual(product.description, product_dictionary["description"])
@@ -134,7 +136,7 @@ class TestProductModel(unittest.TestCase):
         # create a product
         product = ProductFactory()
         # add a log message displaying the product for debugging errors
-        logging.info("Product details: " + str(product.serialize()))
+        logging.info("Product details: %s", str(product.serialize()))
         # to assure that id is auto-generated, setting the id to none before record is created
         product.id = None
 
@@ -232,7 +234,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(len(products), 0)
 
         # create 5 records
-        for i in range(5):
+        for _ in range(5):
             new_product = ProductFactory()
             new_product.create()
 
@@ -359,6 +361,7 @@ class TestProductModel(unittest.TestCase):
             product.deserialize({"stocks": 8})
 
     def test_find_by_id(self):
+        """It should find a product by id"""
         products = ProductFactory.create_batch(5)
         for product in products:
             product.create()
@@ -369,6 +372,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(first, found.id)
 
     def test_find_by_price(self):
+        """It should find a product by price"""
         products = ProductFactory.create_batch(5)
         for product in products:
             product.create()
@@ -383,6 +387,7 @@ class TestProductModel(unittest.TestCase):
             self.assertEqual(product.price, first)
 
     def test_find_by_price_str_value(self):
+        """It should find product by price as string input"""
         products = ProductFactory.create_batch(5)
         for product in products:
             product.create()
