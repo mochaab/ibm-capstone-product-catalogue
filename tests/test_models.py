@@ -67,6 +67,30 @@ class TestProductModel(unittest.TestCase):
         """This runs after each test"""
         db.session.remove()
 
+    def create_and_validate_product(self):
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        return product
+
+    def validate_product(self, product):
+        "It should validate all fields of product once factory is created"
+        self.assertIsNotNone(product.id)
+        self.assertIsNotNone(product.name)
+        self.assertIsNotNone(product.description)
+        self.assertIsNotNone(product.available)
+        self.assertIsNotNone(product.price)
+        self.assertIsNotNone(product.category)
+    
+    def validate_serialized_deserialized(self,product,product_dictionary):
+        self.assertEqual(product.id, product_dictionary["id"])
+        self.assertEqual(product.name, product_dictionary["name"])
+        self.assertEqual(product.description, product_dictionary["description"])
+        self.assertEqual(str(product.price), str(product_dictionary["price"]))
+        self.assertEqual(product.available, product_dictionary["available"])
+        self.assertEqual(product.category.name, product_dictionary["category"])
+
+
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
@@ -87,6 +111,7 @@ class TestProductModel(unittest.TestCase):
         """It should Create a product and add it to the database"""
         products = Product.all()
         self.assertEqual(products, [])
+        
         product = ProductFactory()
         product.id = None
         product.create()
@@ -131,10 +156,8 @@ class TestProductModel(unittest.TestCase):
 
     def test_update_a_product(self):
         """It should Update a Product"""
-        product = ProductFactory()
-        product.id = None
-        product.create()
-        self.assertIsNotNone(product.id)
+        product = self.create_and_validate_product()
+
         # Change it an save it
         product.description = "testing"
         original_id = product.id
@@ -181,10 +204,7 @@ class TestProductModel(unittest.TestCase):
     def test_update_a_product_empty_id(self):
         """It should raise DataValidationError when Id is empty"""
         # create a product
-        product = ProductFactory()
-        product.id = None
-        product.create()
-        self.assertIsNotNone(product.id)
+        product = self.create_and_validate_product()
 
         # update the product
         product.description = "updated"
@@ -198,8 +218,8 @@ class TestProductModel(unittest.TestCase):
     def test_delete_a_product(self):
        """It should delete a product from a database"""
        # create a product
-       product = ProductFactory()
-       product.create()
+       product = self.create_and_validate_product()
+       
        
        # assert that after creating a product and saving to the database
        # there is only one product in the system
@@ -283,10 +303,7 @@ class TestProductModel(unittest.TestCase):
     def test_serialize_product_to_dict(self):
         "It should serialize a product to dictionary"
         # create a product
-        product = ProductFactory()
-        product.id = None
-        product.create()
-        self.assertIsNotNone(product.id)
+        product = self.create_and_validate_product()
 
         product_dictionary = product.serialize()
         self.assertEqual(product.id, product_dictionary["id"])
@@ -297,16 +314,36 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(product.category.name, product_dictionary["category"])
 
 
+    def test_deserialize(self):
+        """It should deserialize the dictionary to product object"""
+        # create a product
+        product = self.create_and_validate_product()
+
+        product_dictionary = product.serialize()
+        self.validate_serialized_deserialized(product, product_dictionary)
+
+        product.deserialize(product_dictionary)
+        self.validate_serialized_deserialized(product, product_dictionary)
+        
 
     def test_deserialize_available_not_bool(self):
         """It should throw an exception if available is not bool"""
         # create a product
-        product = ProductFactory()
-        product.id = None
-        product.create()
-        self.assertIsNotNone(product.id)
+        product = self.create_and_validate_product()
 
-    #     # deserialize
+        product_dictionary = product.serialize()
+        self.validate_serialized_deserialized(product, product_dictionary)
+
+        # deserialize with wrong available value     
+        product_dictionary["available"] = "yes"
+
+        with self.assertRaises(DataValidationError): 
+            product.deserialize(product_dictionary)
+
+    
+
+
+
 
 
 
