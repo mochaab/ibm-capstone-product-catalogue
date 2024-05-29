@@ -340,7 +340,7 @@ class TestProductModel(unittest.TestCase):
         # create a product
         product = self.create_and_validate_product()
 
-        # Incomplete data
+        # Incomplete data (KeyError)
         product_dictionary = {
             "name": "Laptop",
             "description": "A high-performance laptop",
@@ -356,9 +356,17 @@ class TestProductModel(unittest.TestCase):
         product = ProductFactory()
 
         # product_dictionary = {}
-
+        # Invalid attribute (TypeError)
         with self.assertRaises(DataValidationError):
             product.deserialize({"stocks": 8})
+
+        # Attributes with wrong types (AttributeError)
+        with self.assertRaises(DataValidationError):
+            product.deserialize({"name": 0,
+                                 "description": 1,
+                                 "price": Decimal("333.1"),
+                                 "available": True,
+                                 "category": Category.CLOTHS})
 
     def test_find_by_id(self):
         """It should find a product by id"""
