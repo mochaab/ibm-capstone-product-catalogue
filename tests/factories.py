@@ -17,23 +17,32 @@
 """
 Test Factory to make fake objects for testing
 """
+import random
 import factory
-from tests.custom_factories import CustomFactory
 from factory.fuzzy import FuzzyDecimal
 from service.models import Product, Category
 
-AVAILABILITY = [x for x in [True, False]]
-PRODUCT_NAME = [x for x in ["Hat",
-                            "Pants",
-                            "Shirt",
-                            "Apple",
-                            "Banana",
-                            "Pots",
-                            "Towels",
-                            "Ford",
-                            "Chevy",
-                            "Hammer",
-                            "Wrench"]]
+AVAILABILITY = [True, False]
+PRODUCT_NAME = ["Hat",
+                "Pants",
+                "Shirt",
+                "Apple",
+                "Banana",
+                "Pots",
+                "Towels",
+                "Ford",
+                "Chevy",
+                "Hammer",
+                "Wrench"]
+
+
+class CustomFactory():
+    """ Creates fake Accounts """
+
+    @classmethod
+    def random_choice(cls, types) -> list:
+        """ This randomly choice a value in the list of types """
+        return random.choice(types)
 
 
 class ProductFactory(factory.Factory):
@@ -46,14 +55,14 @@ class ProductFactory(factory.Factory):
 
     id = factory.Sequence(lambda n: n)
     # Add code to create Fake Products
-    name = CustomFactory.random_choice(PRODUCT_NAME)
+    name = CustomFactory.random_choice(types=PRODUCT_NAME)
     description = factory.Faker("text")
     price = FuzzyDecimal(0.5, 2000.0, 2)
-    available = CustomFactory.random_choice(AVAILABILITY)
+    available = CustomFactory.random_choice(types=AVAILABILITY)
     category = CustomFactory.random_choice(
-        [Category.UNKNOWN,
-         Category.CLOTHS,
-         Category.FOOD,
-         Category.HOUSEWARES,
-         Category.AUTOMOTIVE,
-         Category.TOOLS])
+        types=[Category.UNKNOWN,
+               Category.CLOTHS,
+               Category.FOOD,
+               Category.HOUSEWARES,
+               Category.AUTOMOTIVE,
+               Category.TOOLS])
