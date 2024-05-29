@@ -347,7 +347,7 @@ class TestProductModel(unittest.TestCase):
         product = self.create_and_validate_product()
 
         # Incomplete data
-        product_dictionary = invalid_data = {
+        product_dictionary = {
             "name": "Laptop",
             "description": "A high-performance laptop",
             "available": True,
@@ -356,15 +356,15 @@ class TestProductModel(unittest.TestCase):
         with self.assertRaises(DataValidationError): 
             product.deserialize(product_dictionary)
 
-    # def test_deserialize_attribute_invalid(self):
-    #     """It should throw an error when a non-existing attribute is assigned"""
+    def test_deserialize_attribute_invalid(self):
+        """It should throw an error when a non-existing attribute is assigned"""
 
-    #     product = Product()
+        product = ProductFactory()
 
-    #     product_dictionary = {}
+        # product_dictionary = {}
 
-    #     with self.assertRaises(DataValidationError): 
-    #         product.deserialize({})
+        with self.assertRaises(DataValidationError): 
+            product.deserialize({"stocks":8})
 
 
     def test_find_by_id(self):
@@ -391,6 +391,19 @@ class TestProductModel(unittest.TestCase):
         for product in found: 
             self.assertEqual(product.price, first)
 
+    def test_find_by_price_str_value(self):
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+
+        first = str(products[0].price)
+        # occurrences = len([product for product in products if product.price == first])
+        found = Product.find_by_price(first)
+
+        # self.assertEqual(found.count(),occurrences)
+
+        for product in found: 
+            self.assertEqual(product.price,Decimal(first))
 
 
 
