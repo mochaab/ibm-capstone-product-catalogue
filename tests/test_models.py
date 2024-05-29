@@ -340,6 +340,40 @@ class TestProductModel(unittest.TestCase):
         with self.assertRaises(DataValidationError): 
             product.deserialize(product_dictionary)
 
+    def test_deserialize_attribute_missing(self):
+        """It should throw an error when a attributes are not complete"""
+
+        # create a product
+        product = self.create_and_validate_product()
+
+        # Incomplete data
+        product_dictionary = invalid_data = {
+            "name": "Laptop",
+            "description": "A high-performance laptop",
+            "available": True,
+        }
+        
+        with self.assertRaises(DataValidationError): 
+            product.deserialize(product_dictionary)
+
+    def test_deserialize_attribute_invalid(self):
+        """It should throw an error when a non-existing attribute is assigned"""
+
+        product = self.create_and_validate_product()
+
+        product_dictionary = {
+            "name": "Laptop",
+            "description": "A high-performance laptop",
+            "price": "999.99",
+            "available": True,
+            "category": Category.CLOTHS,
+            "stocks":2 # non-existing attribute
+        }
+
+        with self.assertRaises(DataValidationError): 
+            product.deserialize(product_dictionary)
+
+
     
 
 
