@@ -317,7 +317,7 @@ class TestProductModel(unittest.TestCase):
 
         product.deserialize(product_dictionary)
         self.validate_serialized_deserialized(product, product_dictionary)
-        
+
     def test_deserialize_available_not_bool(self):
         """It should throw an exception if available is not bool"""
         # create a product
@@ -326,7 +326,7 @@ class TestProductModel(unittest.TestCase):
         product_dictionary = product.serialize()
         self.validate_serialized_deserialized(product, product_dictionary)
 
-        # deserialize with wrong available value     
+        # deserialize with wrong available value
         product_dictionary["available"] = "yes"
 
         with self.assertRaises(DataValidationError):

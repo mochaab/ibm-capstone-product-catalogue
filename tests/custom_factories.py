@@ -12,8 +12,9 @@ import random
 
 # from factory.fuzzy import FuzzyChoice, FuzzyDate
 
+
 class CustomFactory():
     """ Creates fake Accounts """
-    
+
     def random_choice(types) -> list:
         return random.choice(types)
