@@ -188,7 +188,7 @@ class TestProductModel(unittest.TestCase):
 
         # update the product
         product.description = "updated"
-        with self.assertRaises(DataValidationError) as context: 
+        with self.assertRaises(DataValidationError): 
             product.id = None
             product.update()
         # self.assertEqual(str(context.exception),"Update called with empty ID field")
@@ -279,6 +279,34 @@ class TestProductModel(unittest.TestCase):
         # check if category for found and count is really the same
         for product in found:
             self.assertEqual(product.category, category)
+
+    def test_serialize_product_to_dict(self):
+        "It should serialize a product to dictionary"
+        # create a product
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+
+        product_dictionary = product.serialize()
+        self.assertEqual(product.id, product_dictionary["id"])
+        self.assertEqual(product.name, product_dictionary["name"])
+        self.assertEqual(product.description, product_dictionary["description"])
+        self.assertEqual(str(product.price), str(product_dictionary["price"]))
+        self.assertEqual(product.available, product_dictionary["available"])
+        self.assertEqual(product.category.name, product_dictionary["category"])
+
+
+
+    def test_deserialize_available_not_bool(self):
+        """It should throw an exception if available is not bool"""
+        # create a product
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+
+    #     # deserialize
 
 
 
