@@ -223,4 +223,25 @@ class TestProductModel(unittest.TestCase):
         for product in found:
             self.assertEqual(product.available, availability)
 
+    def test_find_product_by_category(self):
+        """It should find product by category"""
+        # create products
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        category = products[0].category
+        count = len([product for product in products if product.category == category])
+        found = Product.find_by_category(category)
+
+        # check the number of occurrences
+        self.assertEqual(found.count(), count)
+
+        # check if category for found and count is really the same
+        for product in found:
+            self.assertEqual(product.category, category)
+
+
+
+
+
 
