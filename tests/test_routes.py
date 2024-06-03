@@ -29,10 +29,10 @@ import logging
 from decimal import Decimal
 from unittest import TestCase
 from service import app
+from urllib.parse import quote_plus
 from service.common import status
-from service.models import db, init_db, Product
+from service.models import db, init_db, Product, Category
 from tests.factories import ProductFactory
-
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
 # logging.disable(logging.CRITICAL)
@@ -253,6 +253,44 @@ class TestProductRoutes(TestCase):
         # tripple check: if all names are the same
         for product in data: 
             self.assertEqual(product["name"], product_name)
+    
+    def test_get_products_by_category(self):
+        """It should get all products by category"""
+        # create products
+        products = self._create_products(5)
+        product_category = products[0].category
+        product_count = len([product for product in products if product.category == product_category])
+        response = self.client.get(
+            BASE_URL, 
+            query_string=f"category={product_category.name}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # check if returned json has the same count
+        data = response.get_json()
+        self.assertEqual(product_count, len(data))
+
+        # tripple check: if all names are the same
+        for product in data: 
+            self.assertEqual(product["category"], product_category.name)
+
+    def test_get_products_by_availability(self):
+        """It should get all products by availability"""
+        # create products
+        products = self._create_products(5)
+        product_availability = products[0].available
+        product_count = len([product for product in products if product.available == product_availability])
+        response = self.client.get(
+            BASE_URL, 
+            query_string=f"available={product_availability}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # check if returned json has the same count
+        data = response.get_json()
+        self.assertEqual(product_count, len(data))
+
+        # tripple check: if all names are the same
+        for product in data: 
+            self.assertEqual(product["available"], product_availability)
 
     ######################################################################
     # Utility functions

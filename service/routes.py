@@ -20,7 +20,7 @@ Product Store Service with UI
 """
 from flask import jsonify, request, abort
 from flask import url_for  # noqa: F401 pylint: disable=unused-import
-from service.models import Product
+from service.models import Product, Category
 from service.common import status  # HTTP Status Codes
 from . import app
 
@@ -111,6 +111,24 @@ def list_products():
     app.logger.info("Request to read all products")
     products = Product.all()
 
+    name = request.args.get("name")
+    category = request.args.get("category")
+    available = request.args.get("available")
+    if name:
+        app.logger.info("Find by name: %s", name)
+        products = Product.find_by_name(name)
+    elif category:
+        app.logger.info("Find by category: %s", category)
+        category_val = getattr(Category, category.upper())
+        products = Product.find_by_category(category_val)
+    elif available:
+        app.logger.info("Find by availability: %s", available)
+        availability_val = available.lower() in ["true","yes","1"]
+        products = Product.find_by_availability(availability_val)
+    else:
+        app.logger.info("Find all")
+        products = Product.all()
+
     results = [product.serialize() for product in products]
     app.logger.info("[%s] Products returned", len(results))
     return results, status.HTTP_200_OK
@@ -181,3 +199,32 @@ def delete_products(product_id):
     if product:
         product.delete()
     return "", status.HTTP_204_NO_CONTENT
+
+######################################################################
+# R E A D   A   P R O D U C T   B Y   N A M E
+######################################################################
+
+#
+# PLACE YOUR CODE HERE TO READ A PRODUCT BY NAME
+#
+# @app.route("/products", methods=["GET"])
+# def list_products():
+#     """
+#     Gets a Product by name
+#     This endpoint will get a Product based on name
+#     """
+#     app.logger.info("Request to read a product by name")
+#     products = []
+#     name = request.args.get("name")
+#     if name: 
+#         app.logger.info("Find product by name: %s", name)
+#         products = Product.find_by_name(name)
+#     else: 
+#         app.logger.info("List all products")
+#         products = Product.all()
+#     results = [product.serialize() for product in products]
+#     app.logger.info("[%s] Products returned", len(results))
+#     return results, status.HTTP_200_OK
+
+
+
