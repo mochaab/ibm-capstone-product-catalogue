@@ -60,4 +60,4 @@ def step_impl(context):
         context.resp = requests.post(rest_endpoint, json=response_data)
 
         # assert that the HTTP status code of the response is equal 201
-        assert(context.resp.status_code == HTTP_201_CREATED)
+        assert context.resp.status_code == HTTP_201_CREATED

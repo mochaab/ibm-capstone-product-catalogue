@@ -105,6 +105,12 @@ def step_impl(context, element_name):
 ##################################################################
 
 ## UPDATE CODE HERE ##
+@when('I press the "{button}" button')
+def step_imp(context, button):
+    # Generate the button_id by converting the button name to lowercase and appending '-btn'
+    button_id = button.lower() + '-btn'
+    # Use context.driver.find_element_by_id(button_id) line to find the button element on the web page based on the generated button_id and call the click() method 
+    context.driver.find_element_by_id(button_id).click()
 
 ##################################################################
 # This code works because of the following naming convention:
