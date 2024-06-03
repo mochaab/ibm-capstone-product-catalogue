@@ -225,11 +225,35 @@ class TestProductRoutes(TestCase):
     
     def test_get_all_products(self):
         """It should get all products"""
+        # create products
         products = self._create_products(5)
+        # get products
         response = self.client.get(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # read the returned json
         data = response.get_json()
+        # number of created products should be similar to fetched
         self.assertEqual(len(data), 5)
+
+    def test_get_products_by_name(self):
+        """It should get all products by name"""
+        # create products
+        products = self._create_products(5)
+        product_name = products[0].name
+        product_count = len([product for product in products if product.name == product_name])
+        response = self.client.get(
+            BASE_URL, 
+            query_string=f"name={quote_plus(product_name)}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # check if returned json has the same count
+        data = response.get_json()
+        self.assertEqual(product_count, len(data))
+
+        # tripple check: if all names are the same
+        for product in data: 
+            self.assertEqual(product["name"], product_name)
+
     ######################################################################
     # Utility functions
     ######################################################################
