@@ -129,7 +129,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(new_product.category, product.category)
 
     #
-    # Test Cases written by Charissa Morales
+    # TEST CASES as part of the exercise
     #
     def test_read_a_product(self):
         """It should read a product from the database"""
