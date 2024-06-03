@@ -164,7 +164,8 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     #
-    # ADD YOUR TEST CASES HERE
+    # The following test cases are written by Charissa Morales
+    # as part of the exercises
     #
 
     ######################################################################
