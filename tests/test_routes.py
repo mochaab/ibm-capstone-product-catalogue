@@ -28,10 +28,10 @@ import os
 import logging
 from decimal import Decimal
 from unittest import TestCase
-from service import app
 from urllib.parse import quote_plus
+from service import app
 from service.common import status
-from service.models import db, init_db, Product, Category
+from service.models import db, init_db, Product
 from tests.factories import ProductFactory
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
@@ -183,7 +183,7 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         self.assertIn("was not found", data["message"])
-    
+
     def test_update_product(self):
         """It should Update an existing Product"""
         # create a product to update
@@ -215,18 +215,18 @@ class TestProductRoutes(TestCase):
         test_product = products[0]
         response = self.client.delete(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(len(response.data),0)
+        self.assertEqual(len(response.data), 0)
 
         # delete a product
         response = self.client.get(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         new_count = self.get_product_count()
         self.assertEqual(new_count, product_count - 1)
-    
+
     def test_get_all_products(self):
         """It should get all products"""
         # create products
-        products = self._create_products(5)
+        self._create_products(5)
         # get products
         response = self.client.get(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -242,18 +242,18 @@ class TestProductRoutes(TestCase):
         product_name = products[0].name
         product_count = len([product for product in products if product.name == product_name])
         response = self.client.get(
-            BASE_URL, 
+            BASE_URL,
             query_string=f"name={quote_plus(product_name)}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         # check if returned json has the same count
         data = response.get_json()
         self.assertEqual(product_count, len(data))
 
         # tripple check: if all names are the same
-        for product in data: 
+        for product in data:
             self.assertEqual(product["name"], product_name)
-    
+
     def test_get_products_by_category(self):
         """It should get all products by category"""
         # create products
@@ -261,16 +261,16 @@ class TestProductRoutes(TestCase):
         product_category = products[0].category
         product_count = len([product for product in products if product.category == product_category])
         response = self.client.get(
-            BASE_URL, 
+            BASE_URL,
             query_string=f"category={product_category.name}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         # check if returned json has the same count
         data = response.get_json()
         self.assertEqual(product_count, len(data))
 
         # tripple check: if all names are the same
-        for product in data: 
+        for product in data:
             self.assertEqual(product["category"], product_category.name)
 
     def test_get_products_by_availability(self):
@@ -280,16 +280,16 @@ class TestProductRoutes(TestCase):
         product_availability = products[0].available
         product_count = len([product for product in products if product.available == product_availability])
         response = self.client.get(
-            BASE_URL, 
+            BASE_URL,
             query_string=f"available={product_availability}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         # check if returned json has the same count
         data = response.get_json()
         self.assertEqual(product_count, len(data))
 
         # tripple check: if all names are the same
-        for product in data: 
+        for product in data:
             self.assertEqual(product["available"], product_availability)
 
     ######################################################################

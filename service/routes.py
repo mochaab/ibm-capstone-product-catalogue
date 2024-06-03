@@ -106,7 +106,7 @@ def create_products():
 def list_products():
     """
     List all products
-    This endpoint will get all Products 
+    This endpoint will get all Products
     """
     app.logger.info("Request to read all products")
     products = Product.all()
@@ -123,7 +123,7 @@ def list_products():
         products = Product.find_by_category(category_val)
     elif available:
         app.logger.info("Find by availability: %s", available)
-        availability_val = available.lower() in ["true","yes","1"]
+        availability_val = available.lower() in ["true", "yes", "1"]
         products = Product.find_by_availability(availability_val)
     else:
         app.logger.info("Find all")
@@ -140,6 +140,8 @@ def list_products():
 #
 # PLACE YOUR CODE HERE TO READ A PRODUCT
 #
+
+
 @app.route("/products/<int:product_id>", methods=["GET"])
 def get_products(product_id):
     """
@@ -161,6 +163,8 @@ def get_products(product_id):
 #
 # PLACE YOUR CODE TO UPDATE A PRODUCT HERE
 #
+
+
 @app.route("/products/<int:product_id>", methods=["PUT"])
 def update_products(product_id):
     """
@@ -172,7 +176,7 @@ def update_products(product_id):
     product = Product.find(product_id)
     if not product:
         abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
-    
+
     # deserializing is mapping from json to object
     # automatically mapping json to object features
     product.deserialize(request.get_json())
@@ -199,32 +203,3 @@ def delete_products(product_id):
     if product:
         product.delete()
     return "", status.HTTP_204_NO_CONTENT
-
-######################################################################
-# R E A D   A   P R O D U C T   B Y   N A M E
-######################################################################
-
-#
-# PLACE YOUR CODE HERE TO READ A PRODUCT BY NAME
-#
-# @app.route("/products", methods=["GET"])
-# def list_products():
-#     """
-#     Gets a Product by name
-#     This endpoint will get a Product based on name
-#     """
-#     app.logger.info("Request to read a product by name")
-#     products = []
-#     name = request.args.get("name")
-#     if name: 
-#         app.logger.info("Find product by name: %s", name)
-#         products = Product.find_by_name(name)
-#     else: 
-#         app.logger.info("List all products")
-#         products = Product.all()
-#     results = [product.serialize() for product in products]
-#     app.logger.info("[%s] Products returned", len(results))
-#     return results, status.HTTP_200_OK
-
-
-
