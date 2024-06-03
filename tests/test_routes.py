@@ -206,7 +206,30 @@ class TestProductRoutes(TestCase):
         updated_product.description = "leather"
         response = self.client.put(f"{BASE_URL}/0", json=updated_product.serialize())
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-       
+
+    def test_delete_product(self):
+        """It should delete a product"""
+        # create the product
+        products = self._create_products(5)
+        product_count = self.get_product_count()
+        test_product = products[0]
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data),0)
+
+        # delete a product
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        new_count = self.get_product_count()
+        self.assertEqual(new_count, product_count - 1)
+    
+    def test_get_all_products(self):
+        """It should get all products"""
+        products = self._create_products(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
     ######################################################################
     # Utility functions
     ######################################################################
